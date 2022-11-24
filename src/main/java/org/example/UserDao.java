@@ -1,15 +1,19 @@
 package org.example;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
+  private SimpleConnectionMaker simpleConnectionMaker;
+
+  public UserDao() {
+    simpleConnectionMaker = new SimpleConnectionMaker();
+  }
 
   public void add(User user) throws ClassNotFoundException, SQLException {
-    Connection conn = getConnection();
+    Connection conn = simpleConnectionMaker.makeNewConnection();
 
     PreparedStatement ps = conn.prepareStatement(
         "insert into users(id, name, password) values(?,?,?)");
@@ -24,16 +28,8 @@ public class UserDao {
     conn.close();
   }
 
-  private static Connection getConnection() throws ClassNotFoundException, SQLException {
-    Class.forName("com.mysql.cj.jdbc.Driver");
-
-    return DriverManager.getConnection(
-        "jdbc:mysql://localhost/toby-spring", "root", "1234"
-    );
-  }
-
   public User get(String id) throws ClassNotFoundException, SQLException {
-    Connection conn = getConnection();
+    Connection conn = simpleConnectionMaker.makeNewConnection();
 
     PreparedStatement ps = conn.prepareStatement(
         "select * from users where id = ?");
