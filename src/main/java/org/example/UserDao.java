@@ -9,11 +9,7 @@ import java.sql.SQLException;
 public class UserDao {
 
   public void add(User user) throws ClassNotFoundException, SQLException {
-    Class.forName("com.mysql.cj.jdbc.Driver");
-
-    Connection conn = DriverManager.getConnection(
-        "jdbc:mysql://localhost/toby-spring", "root", "1234"
-    );
+    Connection conn = getConnection();
 
     PreparedStatement ps = conn.prepareStatement(
         "insert into users(id, name, password) values(?,?,?)");
@@ -28,12 +24,16 @@ public class UserDao {
     conn.close();
   }
 
-  public User get(String id) throws ClassNotFoundException, SQLException {
+  private static Connection getConnection() throws ClassNotFoundException, SQLException {
     Class.forName("com.mysql.cj.jdbc.Driver");
 
-    Connection conn = DriverManager.getConnection(
+    return DriverManager.getConnection(
         "jdbc:mysql://localhost/toby-spring", "root", "1234"
     );
+  }
+
+  public User get(String id) throws ClassNotFoundException, SQLException {
+    Connection conn = getConnection();
 
     PreparedStatement ps = conn.prepareStatement(
         "select * from users where id = ?");
